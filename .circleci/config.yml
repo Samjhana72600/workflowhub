@@ -1,0 +1,49 @@
+version: 2.1
+
+jobs:
+  backend-test:
+    docker:
+      - image: cimg/python:3.12
+    environment:
+      DJANGO_SECRET_KEY: ci-only-secret-key
+      DJANGO_DEBUG: "False"
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: pip install -r backend/requirements.txt
+      - run:
+          name: Run Django tests
+          command: cd backend && python manage.py test
+
+  build-backend-image:
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+      - run:
+          name: Build backend Docker image
+          command: docker build -t workflowhub-backend:$CIRCLE_SHA1 ./backend
+
+  build-frontend-image:
+    machine:
+      image: ubuntu-2204:current
+    environment:
+      VITE_API_URL: http://localhost:8000/api
+    steps:
+      - checkout
+      - run:
+          name: Build frontend Docker image
+          command: >
+            docker build
+            --build-arg VITE_API_URL=$VITE_API_URL
+            -t workflowhub-frontend:$CIRCLE_SHA1 ./frontend
+
+workflows:
+  build-and-test:
+    jobs:
+      - backend-test
+      - build-backend-image:
+          requires:
+            - backend-test
+      - build-frontend-image
