@@ -70,3 +70,12 @@ Send `Authorization: Token <token>` on all `/api/items/` requests.
 | VITE_API_URL | frontend (build time) | API base URL |
 
 For real deployments store secrets in GitHub Actions secrets / CircleCI environment variables, not in the repo.
+## CI/CD Workflow
+
+WorkflowHub uses automated CI/CD pipelines to improve
+software development and deployment.
+
+- GitHub Actions for automated workflows.
+- CircleCI for continuous integration.
+- Docker for containerisation.
+- Docker Compose for local application testing.
